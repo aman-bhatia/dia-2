@@ -58,8 +58,6 @@ int main(int argc, char *argv[])
         image.push_back(temp);
     }
 
-    namedWindow( window_name, CV_WINDOW_OPENGL | CV_WINDOW_AUTOSIZE);		// Create a window for display.
-    setMouseCallback(window_name, draw, NULL);                              //set the callback function for any mouse event
     morph_image(image[0],image[1]);
 
     return a.exec();

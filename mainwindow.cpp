@@ -18,3 +18,8 @@ void MainWindow::on_pushButton_clicked()
 {
     setFeatures();
 }
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    triangulate();
+}
