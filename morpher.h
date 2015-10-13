@@ -4,17 +4,19 @@
 #include "mainwindow.h"
 #include "photo.h"
 
+extern bool warp;
+
 class Morpher
 {
 public:
   int TIME;    // in second
   double FPS;    // frames per second
-  bool make_video;
-  string window_name;
 
   Morpher();
-  void morph_photos(Photo &photo1, Photo &photo2, string name);
-  void merge_parts(string name);
+	Point3f getBarycentricCoord(Point2f p, vector<Point2f> &triangle);
+	vector< Coord > getFeaturePoints(vector<Photo> photos, vector<float> weights);
+	Mat morph_photos(vector<Photo> &photos, vector<float> weights);
+	Mat warp_photos(Photo orig_img,vector<Photo> &photos, vector<float> weights);
 };
 
 #endif // MORPHER_H

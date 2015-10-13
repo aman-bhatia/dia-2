@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>464</width>
-    <height>553</height>
+    <height>611</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,18 +46,18 @@
       <x>10</x>
       <y>230</y>
       <width>441</width>
-      <height>211</height>
+      <height>271</height>
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="pushButton_proceed">
     <property name="enabled">
      <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>320</x>
-      <y>450</y>
+      <x>180</x>
+      <y>510</y>
       <width>131</width>
       <height>41</height>
      </rect>
@@ -66,13 +66,13 @@
      <string>Proceed -&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QPushButton" name="pushButton_man_feature">
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>250</y>
+      <y>150</y>
       <width>281</width>
-      <height>81</height>
+      <height>51</height>
      </rect>
     </property>
     <property name="text">
@@ -82,13 +82,16 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_4">
+   <widget class="QPushButton" name="pushButton_make_video">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>100</x>
-      <y>350</y>
+      <y>360</y>
       <width>281</width>
-      <height>81</height>
+      <height>51</height>
      </rect>
     </property>
     <property name="text">
@@ -98,22 +101,6 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>190</y>
-      <width>371</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
    <widget class="QProgressBar" name="progressBar">
     <property name="enabled">
      <bool>true</bool>
@@ -121,7 +108,7 @@
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>150</y>
+      <y>40</y>
       <width>371</width>
       <height>23</height>
      </rect>
@@ -137,7 +124,7 @@
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>180</y>
+      <y>70</y>
       <width>371</width>
       <height>31</height>
      </rect>
@@ -146,15 +133,85 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <zorder>pushButton_2</zorder>
-   <zorder>pushButton_3</zorder>
+   <widget class="QCheckBox" name="checkBox_warp">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>120</y>
+      <width>141</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Warp Images</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_quit">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>510</y>
+      <width>131</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Quit</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_path">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>290</y>
+      <width>281</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Draw Path</string>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_auto_feature">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>220</y>
+      <width>281</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Automatically Set Features</string>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <zorder>listView</zorder>
+   <zorder>pushButton_proceed</zorder>
+   <zorder>pushButton_man_feature</zorder>
    <zorder>pushButton</zorder>
    <zorder>label</zorder>
-   <zorder>pushButton_4</zorder>
-   <zorder>label_2</zorder>
-   <zorder>listView</zorder>
+   <zorder>pushButton_make_video</zorder>
    <zorder>progressBar</zorder>
    <zorder>progress_label</zorder>
+   <zorder>checkBox_warp</zorder>
+   <zorder>pushButton_quit</zorder>
+   <zorder>pushButton_path</zorder>
+   <zorder>pushButton_auto_feature</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

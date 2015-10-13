@@ -25,13 +25,15 @@ SOURCES += main.cpp\
     application.cpp \
     morpher.cpp \
     manualfeature.cpp \
-    waitingspinnerwidget.cpp
+    drawpath.cpp \
+    featureDetection.cpp
 
 HEADERS  += mainwindow.h \
     photo.h \
     application.h \
     morpher.h \
     manualfeature.h \
-    waitingspinnerwidget.h
+    drawpath.h \
+    featureDetection.h
 
 FORMS    += mainwindow.ui
