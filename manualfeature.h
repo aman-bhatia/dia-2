@@ -7,10 +7,11 @@
 class ManualFeature
 {
 public:
-  std::string window_name;
+	std::string window_name;
 
-  ManualFeature();
-  void setFeatures();
+	ManualFeature();
+	~ManualFeature();
+	void setFeatures();
 };
 
 #endif // MANUALFEATURE_H

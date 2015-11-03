@@ -1,8 +1,8 @@
 #include "manualfeature.h"
 
-ManualFeature::ManualFeature()
-{
-}
+ManualFeature::ManualFeature(){}
+
+ManualFeature::~ManualFeature(){}
 
 string feature_setting_window_name = "Set Features";
 Mat current_feature_setting_image;

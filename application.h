@@ -16,6 +16,7 @@ public:
     std::vector<int> order;
     std::vector<Photo> photos;
     Application(QStringList ls);
+		~Application();
 };
 
 #endif // APPLICATION_H

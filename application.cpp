@@ -18,3 +18,8 @@ Application::Application(QStringList ls){
     }
   }
 }
+
+Application::~Application(){
+	order.clear();
+	photos.clear();
+}

@@ -12,7 +12,8 @@ public:
   int TIME;    // in second
   double FPS;    // frames per second
 
-  Morpher();
+	Morpher();
+	~Morpher();
 	Point3f getBarycentricCoord(Point2f p, vector<Point2f> &triangle);
 	vector< Coord > getFeaturePoints(vector<Photo> photos, vector<float> weights);
 	Mat morph_photos(vector<Photo> &photos, vector<float> weights);

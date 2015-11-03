@@ -7,6 +7,8 @@ Morpher::Morpher(){
 	FPS = 20;
 }
 
+Morpher::~Morpher(){}
+
 vector< Point2f > getTriangle(Coord p, Subdiv2D &subdiv){
 
 	vector< Point2f > toret(0);
@@ -94,15 +96,24 @@ Mat Morpher::morph_photos(vector<Photo> &photos, vector<float> weights)
 	for(unsigned int i=0; i<photos[0].fp.size(); i++){
 		Point2f temp(0,0);
 		for (unsigned int j=0;j<photos.size();j++){
+//			cout << "Total fp : " << photos[j].fp.size() << endl;
+			if (photos[j].fp[i].first<0 || photos[j].fp[i].first >app->width || \
+					photos[j].fp[i].second<0 || photos[j].fp[i].second>app->height){
+				cout << "Photo name : " << photos[j].name << endl;
+				cout << weights[j] << "    " << photos[j].fp[i].first << "," << photos[j].fp[i].second << endl;
+				exit(0);
+			}
 			temp.x += weights[j] * photos[j].fp[i].first;
 			temp.y += weights[j] * photos[j].fp[i].second;
 		}
+//		cout << i << endl;
+
 		intermediate_fp.push_back(temp);
 		intermediate_subdiv.insert(temp);
 	}
 
-	for (int i=1; i<app->height-1; i++){
-		for (int j=1; j<app->width-1; j++){
+	for (int i=pad; i<app->height-pad; i++){
+		for (int j=pad; j<app->width-pad; j++){
 			vector<Coord> coords(photos.size());
 
 			vector< vector< Coord > > triangle_in_imgs(photos.size());
@@ -164,8 +175,8 @@ Mat Morpher::warp_photos(Photo orig_img,vector<Photo> &photos, vector<float> wei
 		intermediate_subdiv.insert(temp);
 	}
 
-	for (int i=1; i<app->height-1; i++){
-		for (int j=1; j<app->width-1; j++){
+	for (int i=pad; i<app->height-pad; i++){
+		for (int j=pad; j<app->width-pad; j++){
 			Coord coord1;
 
 			vector< Coord > triangle_in_img1;

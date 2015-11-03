@@ -17,14 +17,17 @@
 using namespace std;
 using namespace cv;
 
+extern int pad;
+
 class Photo
 {
 public:
-    string name;
-    Mat img;
-    vector< Coord > fp;
-		Photo(string _name, Mat _img, vector< Coord > _fp);
-    Photo(QString _name);
+	string name;
+	Mat img;
+	vector< Coord > fp;
+	Photo(string _name, Mat _img, vector< Coord > _fp);
+	Photo(QString _name);
+	~Photo();
 };
 
 #endif // PHOTO_H

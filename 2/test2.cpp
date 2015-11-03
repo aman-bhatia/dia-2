@@ -1,78 +1,72 @@
-#include "featureDetection.h"
+#include "opencv2/core/core.hpp"
+#include "opencv2/xfeatures2d.hpp"
+#include "opencv2/opencv.hpp"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string>
+#include <vector>
+using namespace cv;
+using namespace std;
+/** @function main */
+																										
 
-void detect_features()
+
+
+void BGaussian(Mat &img , Mat &result , int spatialsize , int intensitysize , double spatialsigma , double intensitysigma)
 {
-	vector<Mat> imgs(app->num_images);
-
-	// Reduce noise with a kernel 3x3
-	for (int i=0;i<app->num_images;i++){
-		Mat temp;
-		blur( app->photos[i].img, temp, Size(3,3) );
-		Canny( temp,imgs[i], 55, 55*3, 3 );
-	}
-
-	int division = 7;
-	for (int m=0;m<division;m++){
-		for (int n=0;n<division;n++){
-			vector< vector<Point> > img_edges(app->num_images);
-			for (int k=0; k<app->num_images;k++){
-				vector<Point> edges(0);
-				for (int i=1;i<imgs[k].rows/division -1;i++){
-					for(int j=1;j<imgs[k].cols/division -1;j++){
-						if (imgs[k].at<uchar>(m*imgs[k].rows/division + i, n*imgs[k].cols/division + j) == 255){
-							edges.push_back(Point(n*imgs[k].cols/division + j, m*imgs[k].rows/division + i));
+	for(int i = 0 ; i < img.cols ; ++i){
+		for(int j = 0 ; j < img.rows ; ++j){
+			double accumulatedintensity = 0;
+			double accumulatedweights = 0;
+			int current_intensity = img.at<uchar>(j,i);
+			for(int q = -(spatialsize/2) ; q <= (spatialsize/2) ; ++q){
+				for(int w = -(spatialsize/2) ; w <= (spatialsize/2) ; ++w){
+					double spexp = exp(((-1) * (pow(abs(w) , 2) + pow(abs(q) , 2)) )/ (2 * (pow(spatialsigma,2))));
+					//cout << "temp is " << temp << endl;
+					if(j+q >= 0 and j+q < img.rows and i+w>=0 and i+w<img.cols){
+						for(int a = -(intensitysize/2) ; a <= (intensitysize/2) ; ++a){
+							double intenexp = exp(((-1) * (pow(abs(a) , 2)) )/ (2 * (pow(intensitysigma,2))));
+							//cout << "temp is " << temp << endl;
+							if(current_intensity+a >= 0 and current_intensity+a <= 255){
+								accumulatedweights += spexp*intenexp;
+								accumulatedintensity += (img.at<uchar>(j+q,i+w) * intenexp * spexp);
+							}
 						}
 					}
 				}
-				if (edges.size() == 0){
-					break;
-				} else {
-					img_edges[k] = edges;
-				}
-
-				if (k == app->num_images-1){
-					for (int z=0; z<app->num_images;z++){
-						Point temp = img_edges[z][rand() % img_edges[z].size()];
-						Coord fpoint(temp.x,temp.y);
-						app->photos[z].fp.push_back(fpoint);
-						circle(imgs[z],temp,3,WHITE,-1);
-					}
-				}
 			}
+			result.at<uchar>(j,i) = int(accumulatedintensity / accumulatedweights);
 		}
 	}
-
-//	for (int i=0;i<app->num_images;i++){
-//		imshow("Detected Features",imgs[i]);
-//		waitKey();
-//	}
 }
 
 
-// Automatic feature detection
+
+
 
 int masksizer = 30;
 int masksizec = 30;
 int maxaverage = 0;
 Mat abs_grad_x, abs_grad_y;
 
-vector< Coord > auto_feature_detect(string name)
+vector<Point> initialise(string name)
 {
-	Mat src = imread(name);
-	if (src.empty()){
+	Mat src, src_gray , newer;
+	string window_name = "Sobel Demo - Simple Edge Detector";
+	src = imread(name , 1);
+
+	if( !src.data ){
 		cout << "Unable to open Image file\n\n";
 		exit(0);
 	}
-	Mat src_gray , newer;
-	string window_name = "Sobel Demo - Simple Edge Detector";
-
-
+	
 	cvtColor( src, src_gray, CV_RGB2GRAY );
 	//=========================================================================================================
 	Mat grad;
 	int scale = 1;
 	int delta = 0;
 	int ddepth = CV_16S;
+	int c;
 
 	// Generate grad_x and grad_y
 	Mat grad_x, grad_y;
@@ -87,7 +81,7 @@ vector< Coord > auto_feature_detect(string name)
 
 	// Total Gradient (approximate)
 	addWeighted( abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad );
-
+	
 	// eye detection
 	int gridsize = abs_grad_y.rows/16;
 	vector<int> results;
@@ -130,7 +124,7 @@ vector< Coord > auto_feature_detect(string name)
 		results1.push_back(sum);
 	}
 	int max_location1 = 0, sec_max_loc1 = 0 , max_value1 = 0 , sec_max_value1 = 0;
-	for(unsigned int i = 0 ; i < results1.size() ; ++i){
+	for(int i = 0 ; i < results1.size() ; ++i){
 		if(results1.at(i) > max_value1){
 			sec_max_loc1 = max_location1;
 			sec_max_value1 = max_value1;
@@ -144,7 +138,8 @@ vector< Coord > auto_feature_detect(string name)
 	// cout << "second max_location1 " << sec_max_loc1 << endl;
 
 	line(abs_grad_y,Point(10,(10+max_location1)*gridsize),Point(abs_grad_y.cols-10,(10+max_location1)*gridsize),Scalar(255),3);
-
+	
+	long s = 0;
 	for(int i = 0 ; i < abs_grad_y.rows ; ++i){
 		for(int j = 0 ; j < abs_grad_y.cols ; ++j){
 			int q = 0;
@@ -160,19 +155,26 @@ vector< Coord > auto_feature_detect(string name)
 		}
 	}
 
-	imwrite("result.jpg",grad);
+	imwrite("result.jpg",grad); 
 	imwrite("resultx.jpg",abs_grad_x);
 	imwrite("resulty.jpg",abs_grad_y);
 
 	//=============================================================================================================
 
 	newer = src_gray.clone();
+	namedWindow( window_name, CV_WINDOW_AUTOSIZE );
+	int center_val = src_gray.at<uchar>(src.rows/2,src.cols/2);
+	int start = src_gray.at<uchar>(0,0);
+	int limit = 25;
+	int left = 0, top = 0;
+	int prev1 = start , prev2 = 0;
 
 	// imshow( window_name, newer);
 	// waitKey(0);
 	grad = src_gray.clone();
 	src_gray = newer.clone();
 	float max_var = 0;
+	float eye_prob;
 	float max_var2 = 0;
 	float max_i = 0;
 	float max_j = 0;
@@ -262,6 +264,9 @@ vector< Coord > auto_feature_detect(string name)
 		else if(other_features.at<uchar>(i,mouth_col) == 0)
 			end = i;
 	}
+	int middle = (starter + end) / 2;
+	//cout << starter << " " << end << endl;
+	int distance_eye = max_j2 - max_j;
 	Mat extra_features;
 	threshold(abs_grad_x , extra_features , 150 , 255 , THRESH_TOZERO);
 	for(int i = 0 ; i < extra_features.rows ; ++i){
@@ -281,14 +286,14 @@ vector< Coord > auto_feature_detect(string name)
 		}
 	}
 
-	vector< Coord > to_ret(0);
-	to_ret.push_back(make_pair(max_j,max_i));
-	to_ret.push_back(make_pair(max_j2,max_i2));
-	to_ret.push_back(make_pair(mouth_col,starter));
-	to_ret.push_back(make_pair(mouth_col,end));
-	//to_ret.push_back(make_pair(mouth_col,end + (-starter + end)/2)); // this point is going out of image
-	to_ret.push_back(make_pair(mouth_col,(starter + end) / 2));
-	to_ret.push_back(make_pair(mouth_col,((max_j2 - max_j)*2)/3 + max_i));
+	vector<Point> to_ret(0);
+	to_ret.push_back(Point(max_j,max_i));
+	to_ret.push_back(Point(max_j2,max_i2));
+	to_ret.push_back(Point(mouth_col,starter));
+	to_ret.push_back(Point(mouth_col,end));
+	to_ret.push_back(Point(mouth_col,end + (-starter + end)/2));
+	to_ret.push_back(Point(mouth_col,(starter + end) / 2));
+	to_ret.push_back(Point(mouth_col,((max_j2 - max_j)*2)/3 + max_i));
 	// circle(src,Point(max_j,max_i),2,Scalar(255,0,0));
 	// circle(src,Point(max_j2,max_i2),2,Scalar(0,0,255));
 	// circle(src,Point(mouth_col,starter),2,Scalar(0,255,0));
@@ -300,13 +305,13 @@ vector< Coord > auto_feature_detect(string name)
 	for(int i = (max_i + max_i2)/2 ; i < extra_features.rows ; i += (extra_features.rows/(2*number_divisions))){
 		for(int j = extra_features.cols/2 ; j < extra_features.cols ; ++j){
 			if(extra_features.at<uchar>(i,j) != 0){
-				to_ret.push_back(make_pair(j,i));
+				to_ret.push_back(Point(j,i));
 				//circle(src,Point(j,i),2,Scalar(0,255,0));
 			}
 		}
 		for(int j = extra_features.cols/2 ; j >= 0 ; --j){
 			if(extra_features.at<uchar>(i,j) != 0){
-				to_ret.push_back(make_pair(j,i));
+				to_ret.push_back(Point(j,i));
 				// circle(src,Point(j,i),2,Scalar(0,255,0));
 			}
 		}
@@ -315,13 +320,13 @@ vector< Coord > auto_feature_detect(string name)
 	for(int i = (max_i + max_i2)/2 - (extra_features.rows/(2*number_divisions)); i >= 0 ; i -= (extra_features.rows/(2*number_divisions))){
 		for(int j = extra_features.cols/2 ; j < extra_features.cols ; ++j){
 			if(extra_features.at<uchar>(i,j) != 0){
-				to_ret.push_back(make_pair(j,i));
+				to_ret.push_back(Point(j,i));
 				// circle(src,Point(j,i),2,Scalar(0,255,0));
 			}
 		}
 		for(int j = extra_features.cols/2 ; j >= 0 ; --j){
 			if(extra_features.at<uchar>(i,j) != 0){
-				to_ret.push_back(make_pair(j,i));
+				to_ret.push_back(Point(j,i));
 				// circle(src,Point(j,i),2,Scalar(0,255,0));
 			}
 		}
@@ -334,14 +339,14 @@ vector< Coord > auto_feature_detect(string name)
 	//waitKey(0);
 
 	return to_ret;
+	
 }
 
-vector< Coord > map_fp(vector< Coord > &fp){
-	vector< Coord > ret(0);
-	for (unsigned int i=0;i<fp.size();i++){
-		int a = fp[i].first;
-		int b = fp[i].second;
-		ret.push_back(make_pair(a+pad,b+pad));
-	}
-	return ret;
+
+int main( int argc, char** argv )
+{
+	string name(argv[1]);
+	initialise(name);
+	return 0;
 }
+

@@ -134,42 +134,74 @@ void MainWindow::on_pushButton_make_video_clicked()
 		exit(0);
 	}
 
-	Point center(w/2,h/2);
-	vector<float> weights(app->num_images,1.0/app->num_images);
-	Mat center_img = mymorpher.morph_photos(app->photos,weights);
-	vector< Coord > center_fp = mymorpher.getFeaturePoints(app->photos,weights);
-	Photo center_photo("center",center_img,center_fp);
+	if (vertices.size()==2){
+		int processed_images = 1;
+		for (unsigned int i=0; i<vertices.size();i++){
+			double t=0;
+			int num_images = 20;
 
-	for (unsigned int i=0;i<path.size();i++){
-		ui->progress_label->setText(QString::fromStdString("Processing Image " + to_string(i+1) + " of " + to_string(path.size())));
-		ui->progressBar->setValue(i+1);
-		QApplication::processEvents();
+			vector<Photo> photos(1,app->photos[i]);
+			photos.push_back(app->photos[(i+1)%app->num_images]);
 
-		Point p = path[i];
-		for (unsigned int j=0; j<vertices.size();j++){
-			if (isInside(center,vertices.at(j),vertices.at((j+1) % vertices.size()),p)){
-				vector<Point2f> triangle(0);
-				triangle.push_back(center);
-				triangle.push_back(vertices.at(j));
-				triangle.push_back(vertices.at((j+1)%vertices.size()));
-				Point3f bc = mymorpher.getBarycentricCoord(p,triangle);
-
-				vector< Photo > ps(1,center_photo);
-				ps.push_back(app->photos[app->order[j]]);
-				ps.push_back(app->photos[app->order[(j+1)%vertices.size()]]);
-
+			for (int k=0;k<num_images;k++){
+				ui->progress_label->setText(QString::fromStdString("Processing Image " + to_string(processed_images) + " of " + to_string(2*num_images)));
+				ui->progressBar->setValue(processed_images);
+				QApplication::processEvents();
+				processed_images++;
 				vector<float> weights(0);
-				weights.push_back(bc.x);
-				weights.push_back(bc.y);
-				weights.push_back(bc.z);
-
+				weights.push_back(1-t);
+				weights.push_back(t);
 				Mat interm;
+
 				if (warp){
-					interm = mymorpher.warp_photos(app->photos[app->order[0]],ps,weights);
+					interm = mymorpher.warp_photos(app->photos[app->order[0]],photos,weights);
 				} else {
-					interm = mymorpher.morph_photos(ps,weights);
+					interm = mymorpher.morph_photos(photos,weights);
 				}
+
 				out << interm;
+				t += 1.0/num_images;
+			}
+		}
+	} else {
+		Point center(w/2,h/2);
+		vector<float> weights(app->num_images,1.0/app->num_images);
+		Mat center_img = mymorpher.morph_photos(app->photos,weights);
+		vector< Coord > center_fp = mymorpher.getFeaturePoints(app->photos,weights);
+		Photo center_photo("center",center_img,center_fp);
+		qDebug() << 1;
+
+		for (unsigned int i=0;i<path.size();i++){
+			ui->progress_label->setText(QString::fromStdString("Processing Image " + to_string(i+1) + " of " + to_string(path.size())));
+			ui->progressBar->setValue(i+1);
+			QApplication::processEvents();
+
+			Point p = path[i];
+			for (unsigned int j=0; j<vertices.size();j++){
+				if (isInside(center,vertices.at(j),vertices.at((j+1) % vertices.size()),p)){
+					vector<Point2f> triangle(0);
+					triangle.push_back(center);
+					triangle.push_back(vertices.at(j));
+					triangle.push_back(vertices.at((j+1)%vertices.size()));
+					Point3f bc = mymorpher.getBarycentricCoord(p,triangle);
+
+					vector< Photo > ps(1,center_photo);
+					ps.push_back(app->photos[app->order[j]]);
+					ps.push_back(app->photos[app->order[(j+1)%vertices.size()]]);
+
+					vector<float> weights(0);
+					weights.push_back(bc.x);
+					weights.push_back(bc.y);
+					weights.push_back(bc.z);
+
+					Mat interm;
+					if (warp){
+						interm = mymorpher.warp_photos(app->photos[app->order[0]],ps,weights);
+					} else {
+						interm = mymorpher.morph_photos(ps,weights);
+					}
+					out << interm;
+				}
 			}
 		}
 	}
@@ -196,7 +228,20 @@ void MainWindow::on_pushButton_path_clicked()
 
 void MainWindow::on_pushButton_auto_feature_clicked()
 {
-	detect_features();
+	//detect_features();
+
+	for (int i=0;i<app->num_images;i++){
+		vector< Coord > auto_fp = auto_feature_detect(app->photos[i].name);
+		vector< Coord > automated_fp = map_fp(auto_fp);
+		app->photos[i].fp.insert(app->photos[i].fp.begin(),automated_fp.begin(),automated_fp.end());
+	}
+
+	for (int i=1;i<app->num_images;i++){
+		if (app->photos[i].fp.size() != app->photos[0].fp.size()){
+			cout << "Unequal no. of feature points detected...\n";
+			exit(0);
+		}
+	}
 
 	ui->pushButton_auto_feature->setEnabled(false);
 	ui->pushButton_make_video->setEnabled(true);
@@ -205,7 +250,10 @@ void MainWindow::on_pushButton_auto_feature_clicked()
 		Mat img = app->photos[i].img.clone();
 		for (unsigned int j=0;j<app->photos[i].fp.size();j++){
 			Coord temp = app->photos[i].fp[j];
-			circle(img,Point(temp.first,temp.second),3,RED,-1);
+			if (temp.first >=0 && temp.first < img.cols && temp.second>=0 && temp.second < img.rows)
+				circle(img,Point(temp.first,temp.second),3,RED,-1);
+			else
+				cout << "hello, total fp : " << app->photos[i].fp.size() <<" and " << j << "th point is : " << temp.first << "," << temp.second << endl;
 		}
 		imshow("Detected Features",img);
 		waitKey();
