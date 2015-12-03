@@ -87,10 +87,39 @@ void MainWindow::on_pushButton_proceed_clicked()
 
 void MainWindow::on_pushButton_man_feature_clicked()
 {
+	QApplication::setOverrideCursor(QCursor(QPixmap("../DIA_Ass2/images/pencil.png")));
 	ManualFeature manualFeature;
 	manualFeature.setFeatures();
 	ui->pushButton_man_feature->setEnabled(false);
 	ui->pushButton_make_video->setEnabled(true);
+	QApplication::restoreOverrideCursor();
+}
+
+void postProcessVideo(){
+	Morpher mymorpher;
+	VideoCapture in("../DIA_Ass2/output.mov");
+	if (!in.isOpened()){
+		cout << "Unable to open input video\n\n";
+		exit(0);
+	}
+
+	Mat img;
+	in >> img;
+	int r = img.rows;
+	int c = img.cols;
+
+	VideoWriter out("../DIA_Ass2/video.mov", CV_FOURCC('m','p', '4', 'v'), mymorpher.FPS, Size(c-2*pad,r-2*pad)) ;
+	if(!out.isOpened()) {
+		cout <<"Error! Unable to open video file for output.";
+		exit(0);
+	}
+
+	Rect crop_region(pad,pad,img.cols - 2*pad,img.rows - 2*pad);
+	while(!img.empty()){
+		Mat dst = img(crop_region);
+		out << dst;
+		in >> img;
+	}
 }
 
 void MainWindow::on_pushButton_make_video_clicked()
@@ -169,7 +198,6 @@ void MainWindow::on_pushButton_make_video_clicked()
 		Mat center_img = mymorpher.morph_photos(app->photos,weights);
 		vector< Coord > center_fp = mymorpher.getFeaturePoints(app->photos,weights);
 		Photo center_photo("center",center_img,center_fp);
-		qDebug() << 1;
 
 		for (unsigned int i=0;i<path.size();i++){
 			ui->progress_label->setText(QString::fromStdString("Processing Image " + to_string(i+1) + " of " + to_string(path.size())));
@@ -207,8 +235,9 @@ void MainWindow::on_pushButton_make_video_clicked()
 	}
 	ui->progress_label->setText("Morphing Completed Successfully...");
 	ui->progressBar->hide();
+	out.release();
+	postProcessVideo();
 }
-
 
 void MainWindow::on_checkBox_warp_clicked(bool checked)
 {
@@ -223,7 +252,9 @@ void MainWindow::on_pushButton_quit_clicked()
 
 void MainWindow::on_pushButton_path_clicked()
 {
+	QApplication::setOverrideCursor(QCursor(QPixmap("../DIA_Ass2/images/pencil.png")));
 	main_drawpath_function();
+	QApplication::restoreOverrideCursor();
 }
 
 void MainWindow::on_pushButton_auto_feature_clicked()
@@ -260,3 +291,4 @@ void MainWindow::on_pushButton_auto_feature_clicked()
 	}
 	destroyAllWindows();
 }
+

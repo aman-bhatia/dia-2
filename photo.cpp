@@ -1,6 +1,6 @@
 #include "photo.h"
 
-int pad = 25;
+int pad = 10;
 
 Photo::Photo(string _name, Mat _img, vector< Coord > _fp){
 	name = _name;
