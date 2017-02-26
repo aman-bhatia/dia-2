@@ -8,8 +8,8 @@ string feature_setting_window_name = "Set Features";
 Mat current_feature_setting_image;
 int current_feature_setting_image_index = -1;
 
-void draw(int event, int x, int y, int flags, void* param){
-  if (event == CV_EVENT_LBUTTONDOWN){
+void draw(int event, int x, int y, int /*flags*/, void* /*param*/){
+  if (event == EVENT_LBUTTONDOWN){
     circle(current_feature_setting_image, Point(x,y), 7, RED,-1);
     app->photos[current_feature_setting_image_index].fp.push_back(make_pair(x,y));
     imshow(feature_setting_window_name,current_feature_setting_image);
@@ -17,7 +17,7 @@ void draw(int event, int x, int y, int flags, void* param){
 }
 
 void ManualFeature::setFeatures(){
-  namedWindow( feature_setting_window_name, CV_WINDOW_OPENGL | CV_WINDOW_AUTOSIZE);
+  namedWindow( feature_setting_window_name, WINDOW_OPENGL | WINDOW_AUTOSIZE);
   setMouseCallback( feature_setting_window_name, draw, NULL);
 
   for (int i=0; i<app->num_images; i++){

@@ -108,7 +108,7 @@ void postProcessVideo(){
 	int r = img.rows;
 	int c = img.cols;
 
-	VideoWriter out("../DIA_Ass2/video.mov", CV_FOURCC('m','p', '4', 'v'), mymorpher.FPS, Size(c-2*pad,r-2*pad)) ;
+    VideoWriter out("../DIA_Ass2/video.mov", VideoWriter::fourcc('m','p', '4', 'v'), mymorpher.FPS, Size(c-2*pad,r-2*pad)) ;
 	if(!out.isOpened()) {
 		cout <<"Error! Unable to open video file for output.";
 		exit(0);
@@ -157,7 +157,7 @@ void MainWindow::on_pushButton_make_video_clicked()
 	ui->progressBar->show();
 	QApplication::processEvents();
 
-	VideoWriter out("../DIA_Ass2/output.mov", CV_FOURCC('m','p', '4', 'v'), mymorpher.FPS, app->photos[0].img.size());
+    VideoWriter out("../DIA_Ass2/output.mov", VideoWriter::fourcc('m','p', '4', 'v'), mymorpher.FPS, app->photos[0].img.size());
 	if(!out.isOpened()) {
 		qDebug() <<"Error! Unable to open video file for output.";
 		exit(0);

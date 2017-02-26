@@ -178,7 +178,7 @@ vector< Coord > auto_feature_detect(string name)
 		exit(0);
 	}
 
-	cvtColor( src, src_gray, CV_RGB2GRAY );
+    cvtColor( src, src_gray, COLOR_RGB2GRAY );
 	pair < Mat , Mat > ans;
 	ans = initialise(src_gray);
 	Mat abs_grad_x = ans.first;

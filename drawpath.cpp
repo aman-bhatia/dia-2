@@ -25,14 +25,14 @@ bool isInside(Point a, Point b, Point c, Point p)
 	return (A == A1 + A2 + A3);
 }
 
-void path_draw(int event, int x, int y, int flags, void* param){
-	if (event == CV_EVENT_LBUTTONDOWN){
+void path_draw(int event, int x, int y, int /*flags*/, void* /*param*/){
+    if (event == EVENT_LBUTTONDOWN){
 		left_button_down = true;
-	} else if (event == CV_EVENT_MOUSEMOVE && left_button_down){
+    } else if (event == EVENT_MOUSEMOVE && left_button_down){
 		circle(path_img, Point(x,y), 4, RED, -1);
 		path.push_back(Point(x,y));
 		imshow(winname,path_img);
-	} else if (event == CV_EVENT_LBUTTONUP){
+    } else if (event == EVENT_LBUTTONUP){
 		left_button_down = false;
 	}
 }

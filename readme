@@ -1,0 +1,1 @@
+Detection of key points of faces e.g. eyes, nose, years, lips etc. Then creating a video by morphing these features using delaunay triangulation.
